@@ -24,22 +24,24 @@ ESP8266WiFiMulti WiFiMulti;
 WiFiClient  client;
 
 float humi, alti, pressure, temp;
-const int UPDATE_INTERVAL_SECONDS = 60*5;
+const int UPDATE_INTERVAL_MINUTES = 60*5;
 
 void setup()   {                
   Serial.begin(115200);
   delay(10);
-
-  WiFi.begin(ssid, password);
   
+  WiFi.mode(WIFI_STA);
+  WiFi.begin(ssid, password);
+
+  display.print("Connect WiFi");
+  display.display();
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
+    display.print(".");
+    display.display();
     Serial.print(".");
   }
 
-  Serial.println("");
-  Serial.println("WiFi connected");  
-  Serial.println("IP address: ");
   Serial.println(WiFi.localIP());
 
   ThingSpeak.begin(client);
@@ -129,8 +131,7 @@ void loop()
 
    ThingSpeak.setField(3,temp);
    ThingSpeak.setField(4,humi);
-   //ThingSpeak.writeFields(THINKSPEAK_CHANNEL, THINGSPEAK_API_KEY);
+   ThingSpeak.writeFields(THINKSPEAK_CHANNEL, THINGSPEAK_API_KEY);
   
-   delay(1000 * UPDATE_INTERVAL_SECONDS); 
- 
+   delay(1000 * UPDATE_INTERVAL_MINUTES);
 }
