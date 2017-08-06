@@ -1,24 +1,13 @@
 #include "Secret.h"
-#include <SPI.h>
 #include <Wire.h>
 #include "BlueDot_BME280.h"
-#include <Adafruit_GFX.h>
-#include <Adafruit_SSD1306.h>
 #include <ESP8266WiFi.h>
 #include <ESP8266WiFiMulti.h>
 #include <ESP8266HTTPClient.h>
 #include "ThingSpeak.h"
 #include <math.h>
 
-#define OLED_RESET 2
-Adafruit_SSD1306 display(OLED_RESET);
 BlueDot_BME280 bme280 = BlueDot_BME280();
-
-#define LOGO16_GLCD_HEIGHT 16 
-#define LOGO16_GLCD_WIDTH  16 
-#if (SSD1306_LCDHEIGHT != 64)
-#error("Height incorrect, please fix Adafruit_SSD1306.h!");
-#endif
 
 ESP8266WiFiMulti WiFiMulti;
 WiFiClient  client;
@@ -33,12 +22,9 @@ void setup()   {
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
 
-  display.print("Connect WiFi");
-  display.display();
+ 
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
-    display.print(".");
-    display.display();
     Serial.print(".");
   }
 
@@ -79,19 +65,6 @@ void setup()   {
   else{
     Serial.println(F("BME280 detected!"));
   }
-
-  // by default, we'll generate the high voltage from the 3.3v line internally! (neat!)
-  display.begin(SSD1306_SWITCHCAPVCC, 0x3C);  // initialize with the I2C addr 0x3D (for the 128x64)
-  // init done
-  
-  // Show image buffer on the display hardware.
-  // Since the buffer is intialized with an Adafruit splashscreen
-  // internally, this will display the splashscreen.
-  display.display();
-  delay(1000);
-
-  // Clear the buffer.
-  display.clearDisplay();
 }
 
 //*********************************************************************
@@ -102,19 +75,6 @@ void loop()
    humi = roundf(bme280.readHumidity() * 10) / 10;
    alti = bme280.readAltitudeMeter();
    pressure = bme280.readPressure();
-
-   display.clearDisplay();
-   display.setTextSize(3);
-   display.setTextColor(WHITE);
-   display.setCursor(0,0);
-   display.print(temp,1);display.print((char)247);display.println("C");
-   display.setTextSize(1); display.println("");
-   display.setTextSize(3);
-   display.print(humi,1);display.println("%"); 
-   display.setTextSize(1);
-   display.print("Alti:"); display.print(alti,1); display.print("m ");
-   display.print(pressure,1); display.print("hPa"); 
-   display.display();
 
    Serial.print(F("Duration in Seconds:\t\t"));
    Serial.println(float(millis())/1000);
